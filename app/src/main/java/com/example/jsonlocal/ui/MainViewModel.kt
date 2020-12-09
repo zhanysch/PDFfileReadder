@@ -16,7 +16,10 @@ class MainViewModel(private val context: Context) : ViewModel() {
     fun loadData() {
         val data = FileUtils.getWordData()  // для json
         Log.d("sgdsg", "gsdggdsg")
+    }
 
+    fun loadPDF(): String {
+        return FileUtils.loadPdfFromAsset()[0]   // вызов функции из classa FileUtils и метода
     }
 
     fun replaceWords(message : String): String{

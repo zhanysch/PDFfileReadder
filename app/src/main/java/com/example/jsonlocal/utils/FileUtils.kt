@@ -1,20 +1,16 @@
 package com.example.jsonlocal.utils
 
-import android.content.Context
 import android.content.res.AssetManager
 import android.net.Uri
 import android.util.Log
-import androidx.core.content.FileProvider
-import com.example.jsonlocal.BuildConfig
+import android.widget.Toast
 import com.example.jsonlocal.JsonFileApp
 import com.example.jsonlocal.data.MainWords
 import com.google.gson.Gson
-import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
-import java.lang.System.`in`
-import java.lang.System.out
+
 
 const val WORDS_PATH = "words.json"   // const val WORDS_PATH = "words.json" -> это  название файла с asset
 object FileUtils {
@@ -47,33 +43,24 @@ object FileUtils {
     }
 
     // для чтения PdfFile
-     fun loadPdfFromAsset(): Uri {
-        val assetManager: AssetManager = JsonFileApp.applicationContext().assets
+     fun loadPdfFromAsset(): MutableList<String> {  // метод считывает пдф файлы
+        val context = JsonFileApp.applicationContext()
+        val pdfFiles: MutableList<String> = ArrayList()
+        val assetManager: AssetManager = context.assets
 
-        var `in`: InputStream? = null
-        var out: OutputStream? = null
-        val file: File = File(JsonFileApp.applicationContext().filesDir, "abc.pdf")
-        val uri = FileProvider.getUriForFile(
-            JsonFileApp.applicationContext(),
-            BuildConfig.APPLICATION_ID.toString() + ".provider",
-            file
-        )
         try {
-            `in` = assetManager.open("abc.pdf")
-            out = JsonFileApp.applicationContext()
-                .openFileOutput(file.name, Context.MODE_WORLD_READABLE)
-            copyFile(`in`, out)
-            `in`.close()
-            `in` = null
-            out!!.flush()
-            out.close()
-            out = null
-        } catch (e: Exception) {
-            Log.e("tag", e.message!!)
+            for (name in assetManager.list("")!!) {
+                // include files which end with pdf only
+                if (name.toLowerCase().endsWith("pdf")) {
+                    pdfFiles.add(name)
+                }
+            }
+        } catch (ioe: IOException) {
+            val mesg = "Could not read files from assets folder"
+            Log.e("TAG", mesg)
+            Toast.makeText(context, mesg, Toast.LENGTH_LONG).show()
         }
-        return uri
-
-        Log.d("sdgsdgs", "gsdgdsgdsgs")
+        return pdfFiles
      }
 
     private fun copyFile(inputStream: InputStream, outputStream: OutputStream) {  // pdf
